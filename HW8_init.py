@@ -16,7 +16,6 @@ class Phone(Field):
             raise ValueError("Phone number must have 10 digits")
         super().__init__(phone) # эта строка вызывает конструктор класса  Field и передает в него телефонный номер. То есть при успешной првоерке номера, мы передаем номер в конструктор класса Field где он будет сохранен в атрибуте value
 
-##new class### 
 class Birthday(Field): 
     def __init__(self, value): 
         try: 
@@ -92,22 +91,13 @@ class AddressBook(UserDict):
     def __str__(self):
          # возвращаем строковое представление всех записей в адресной книге
         return ' ------'.join(str(record) for record in self.data.values())
-def save_data(book, filename = "name.pkl"): ###### book обьект adressbook 
-    with open(filename, "wb") as f :########
-        pickle.dump(book, f)#########
-def load_data(filename = "name.pkl"):####### ##
-    try:
-        with open(filename, "rb") as f:## #
-            return pickle.load(f)######## возвр обьект adressbook
-    except FileNotFoundError: #### если файл не найден 
-        return AddressBook()### возвр пустой обьект adressbook
 
 ##########  декораторы ошибок #######
 def input_error(func):
     def inner(*args, **kwargs):
         try:
             return func(*args, **kwargs)
-        except (ValueError, IndexError) as e:
+        except (ValueError, IndexError, KeyError) as e:
             return str(e)
     return inner
 def parse_input(user_input):
@@ -179,15 +169,26 @@ def all_contacts(book):
         return "\n".join(str(record) for record in book.data.values()) 
     else:
         return "no contacts"
-        
+#сохраняем и загружаем адресную книгу 
+def save_data(book, filename = "name.pkl"): ###### book обьект adressbook 
+    with open(filename, "wb") as f :########
+        pickle.dump(book, f)#########
+def load_data(filename = "name.pkl"):####### ##
+    try:
+        with open(filename, "rb") as f:## #
+            return pickle.load(f)######## возвр обьект adressbook
+    except FileNotFoundError: #### если файл не найден 
+        return AddressBook()### возвр пустой обьект adressbook
 
 def main():
-    book = AddressBook()
-    print("welcome")
+    book = load_data() # загружаем данные из файлы 
+    # book = AddressBook()
+    print("welcome to hell")
     while True:
         user_input = input("enter command:")
         command, args = parse_input(user_input)
         if command == "close" or command == "exit":
+            save_data(book) #сохраняем данные перед выходом 
             print("Good bye")
             break 
         elif command == "hello":
